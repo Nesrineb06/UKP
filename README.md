@@ -46,11 +46,6 @@ Minimal full-stack prototype for a **blind review comparison system**: two revie
 
 Relationships: reviews belong to models; comparisons link two reviews; votes reference a comparison and a winner.
 
-## Deliverables (thesis test)
-
-- **Code**: This repository (backend + frontend).
-- **Video demo**: Record a short walkthrough: open Compare → vote on one or two comparisons → show Leaderboard. You can use OBS, Loom, or any screen recorder; 2–3 minutes is enough.
-
 ## Tech stack
 
 - **Backend**: Flask, SQLite, flask-cors  
