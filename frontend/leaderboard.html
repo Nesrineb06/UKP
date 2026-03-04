@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReviewArena – Leaderboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>ReviewArena</h1>
+      <nav>
+        <a href="index.html">Compare</a>
+        <a href="leaderboard.html" class="active">Leaderboard</a>
+        <button type="button" id="reset-btn" class="nav-reset-btn">Reset votes</button>
+      </nav>
+    </header>
+
+    <main>
+      <h2 class="leaderboard-title">Leaderboard</h2>
+      <p class="instruction">Models ranked by how often their review was chosen as better.</p>
+      <div id="loading">Loading leaderboard</div>
+      <ol id="leaderboard" class="leaderboard-list hidden"></ol>
+      <div id="error" class="hidden"></div>
+    </main>
+  </div>
+
+  <script>
+    const API = window.API_BASE || '';
+    const loading = document.getElementById('loading');
+    const list = document.getElementById('leaderboard');
+    const errEl = document.getElementById('error');
+
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    function render(data) {
+      list.classList.remove('hidden');
+      list.innerHTML = data.map((row, i) => {
+        const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+        return `<li class="${rankClass}">
+          <span class="rank">${i + 1}</span>
+          <span class="model-name">${escapeHtml(row.model)}</span>
+          <span class="vote-count"><strong>${row.votes}</strong> votes</span>
+        </li>`;
+      }).join('');
+    }
+
+    async function load() {
+      try {
+        loading.classList.remove('hidden');
+        errEl.classList.add('hidden');
+        const res = await fetch(API + '/leaderboard');
+        if (!res.ok) throw new Error('Failed to load leaderboard');
+        const data = await res.json();
+        loading.classList.add('hidden');
+        render(data);
+      } catch (e) {
+        loading.classList.add('hidden');
+        errEl.textContent = e.message || 'Error loading leaderboard';
+        errEl.classList.remove('hidden');
+      }
+    }
+
+    document.getElementById('reset-btn').addEventListener('click', async () => {
+      const btn = document.getElementById('reset-btn');
+      btn.disabled = true;
+      btn.textContent = 'Resetting…';
+      try {
+        const res = await fetch(API + '/reset-votes', { method: 'POST' });
+        if (!res.ok) throw new Error('Reset failed');
+        errEl.classList.add('hidden');
+        load();
+        btn.textContent = 'Reset votes';
+      } catch (e) {
+        errEl.textContent = e.message || 'Could not reset votes. Is the server running?';
+        errEl.classList.remove('hidden');
+        btn.textContent = 'Reset votes';
+      }
+      btn.disabled = false;
+    });
+
+    load();
+  </script>
+</body>
+</html>

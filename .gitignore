@@ -1,0 +1,5 @@
+backend/venv/
+backend/reviewarena.db
+__pycache__/
+*.pyc
+.env

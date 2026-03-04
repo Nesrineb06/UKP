@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReviewArena – Compare</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>ReviewArena</h1>
+      <nav>
+        <a href="index.html" class="active">Compare</a>
+        <a href="leaderboard.html">Leaderboard</a>
+        <button type="button" id="reset-btn" class="nav-reset-btn">Reset votes</button>
+      </nav>
+    </header>
+
+    <main>
+      <p class="instruction">Read both reviews and pick which one is better. Model names stay hidden until you vote.</p>
+
+      <div id="loading">Loading comparison</div>
+      <div id="comparison" class="hidden">
+        <div class="comparison-wrap">
+          <div class="panels">
+            <div class="panel" id="panel-a">
+              <h2>Review A</h2>
+              <div id="review-a" class="review-text"></div>
+              <p id="model-a" class="model-reveal hidden"></p>
+            </div>
+            <div class="vs-badge">Vs</div>
+            <div class="panel" id="panel-b">
+              <h2>Review B</h2>
+              <div id="review-b" class="review-text"></div>
+              <p id="model-b" class="model-reveal hidden"></p>
+            </div>
+          </div>
+        </div>
+        <div class="actions-wrap">
+          <button id="btn-a" class="vote-btn btn-a">A is better</button>
+          <button id="btn-tie" class="vote-btn btn-tie">Tie</button>
+          <button id="btn-b" class="vote-btn btn-b">B is better</button>
+        </div>
+        <p id="voted-msg" class="voted-msg hidden">Thanks for voting. Model names revealed above.</p>
+        <p><a href="index.html" class="next-link">Next comparison →</a></p>
+      </div>
+      <div id="error" class="hidden"></div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    document.getElementById('reset-btn').addEventListener('click', async () => {
+      const API = window.API_BASE || '';
+      const btn = document.getElementById('reset-btn');
+      btn.disabled = true;
+      btn.textContent = 'Resetting…';
+      try {
+        const res = await fetch(API + '/reset-votes', { method: 'POST' });
+        if (!res.ok) throw new Error('Reset failed');
+        btn.textContent = 'Votes reset!';
+        window.location.reload();
+      } catch (e) {
+        btn.disabled = false;
+        btn.textContent = 'Reset votes';
+        alert('Could not reset votes. Is the server running at ' + (API || window.location.origin) + '?');
+      }
+    });
+  </script>
+</body>
+</html>
